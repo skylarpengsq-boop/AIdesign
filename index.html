@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambient Lighting | JP ENG Shop</title>
+    <meta name="description" content="Premium smart ambient lighting powered by JP ENG sustainable supply chain">
+    
+    <style>
+        :root {
+            --jp-navy: #1a1f3c;
+            --jp-navy-light: #2d3561;
+            --jp-navy-dark: #121529;
+            --jp-gold: #c9a961;
+            --jp-gold-light: #e0c078;
+            --jp-glow: #ffd700;
+            --jp-white: #ffffff;
+            --jp-gray-50: #f8f9fa;
+            --jp-gray-100: #e9ecef;
+            --jp-gray-800: #343a40;
+            --jp-success: #28a745;
+            --jp-error: #dc3545;
+            --jp-font-heading: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+            --jp-font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --jp-space-1: 0.5rem;
+            --jp-space-2: 1rem;
+            --jp-space-3: 1.5rem;
+            --jp-space-4: 2rem;
+            --jp-space-5: 3rem;
+            --jp-space-6: 4rem;
+            --jp-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --jp-transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; font-size: 16px; }
+        
+        body {
+            font-family: var(--jp-font-body);
+            color: var(--jp-gray-800);
+            background-color: var(--jp-white);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Navigation */
+        .jp-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(26, 31, 60, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .jp-nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--jp-space-2) var(--jp-space-3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .jp-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--jp-space-1);
+            text-decoration: none;
+            color: var(--jp-white);
+            font-family: var(--jp-font-heading);
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .jp-logo-text { font-style: italic; }
+        .jp-logo-accent { color: var(--jp-gold); }
+
+        .jp-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--jp-space-2);
+        }
+
+        .jp-user-btn, .jp-cart-btn, .jp-lang-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--jp-white);
+            padding: var(--jp-space-1) var(--jp-space-2);
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: var(--jp-font-body);
+            font-size: 0.875rem;
+            transition: var(--jp-transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .jp-user-btn:hover, .jp-lang-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--jp-gold);
+        }
+
+        .jp-cart-btn {
+            background: var(--jp-gold);
+            color: var(--jp-navy);
+            border: none;
+            font-weight: 600;
+        }
+
+        .jp-cart-btn:hover {
+            background: var(--jp-gold-light);
+            transform: translateY(-2px);
+        }
+
+        .jp-user-btn.logged-in {
+            background: var(--jp-gold);
+            color: var(--jp-navy);
+            border-color: var(--jp-gold);
+        }
+
+        /* Dropdowns */
+        .jp-lang-switcher, .jp-user-section {
+            position: relative;
+        }
+
+        .jp-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            background: var(--jp-white);
+            border: 1px solid var(--jp-gray-100);
+            border-radius: 8px;
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: var(--jp-transition);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            z-index: 1001;
+        }
+
+        .jp-lang-switcher:hover .jp-dropdown,
+        .jp-user-section:hover .jp-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .jp-dropdown a {
+            display: block;
+            padding: var(--jp-space-1) var(--jp-space-2);
+            color: var(--jp-gray-800);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: var(--jp-transition);
+        }
+
+        .jp-dropdown a:hover {
+            background: var(--jp-gray-50);
+            color: var(--jp-navy);
+            padding-left: calc(var(--jp-space-2) + 4px);
+        }
+
+        .jp-user-header {
+            padding: var(--jp-space-2);
+            background: var(--jp-gray-50);
+            border-bottom: 1px solid var(--jp-gray-100);
+            border-radius: 8px 8px 0 0;
+        }
+
+        .jp-user-name { font-weight: 600; color: var(--jp-navy); font-size: 0.875rem; }
+        .jp-user-email { font-size: 0.75rem; color: var(--jp-gray-800); margin-top: 0.25rem; }
+
+        /* Modal */
+        .jp-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(26, 31, 60, 0.8);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--jp-transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--jp-space-3);
+        }
+
+        .jp-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .jp-modal {
+            background: var(--jp-white);
+            border-radius: 12px;
+            max-width: 480px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9) translateY(20px);
+            transition: var(--jp-transition-slow);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .jp-modal-overlay.active .jp-modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .jp-modal-header {
+            padding: var(--jp-space-3);
+            border-bottom: 1px solid var(--jp-gray-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .jp-modal-title {
+            font-family: var(--jp-font-heading);
+            font-size: 1.5rem;
+            color: var(--jp-navy);
+            font-weight: 700;
+        }
+
+        .jp-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--jp-gray-800);
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--jp-transition);
+        }
+
+        .jp-modal-close:hover {
+            background: var(--jp-gray-100);
+        }
+
+        .jp-modal-body {
+            padding: var(--jp-space-3);
+        }
+
+        /* Forms */
+        .jp-form-group {
+            margin-bottom: var(--jp-space-2);
+        }
+
+        .jp-form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--jp-gray-800);
+            margin-bottom: 0.5rem;
+        }
+
+        .jp-required { color: var(--jp-error); margin-left: 0.25rem; }
+
+        .jp-input {
+            width: 100%;
+            padding: 0.75rem var(--jp-space-2);
+            border: 2px solid var(--jp-gray-100);
+            border-radius: 6px;
+            font-family: var(--jp-font-body);
+            font-size: 1rem;
+            transition: var(--jp-transition);
+        }
+
+        .jp-input:focus {
+            outline: none;
+            border-color: var(--jp-gold);
+            box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.1);
+        }
+
+        .jp-form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--jp-space-2);
+        }
+
+        .jp-checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin: var(--jp-space-2) 0;
+        }
+
+        .jp-checkbox {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            accent-color: var(--jp-gold);
+            cursor: pointer;
+        }
+
+        .jp-checkbox-label {
+            font-size: 0.875rem;
+            color: var(--jp-gray-800);
+            line-height: 1.4;
+        }
+
+        .jp-checkbox-label a {
+            color: var(--jp-navy);
+            text-decoration: underline;
+        }
+
+        .jp-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: var(--jp-space-2) var(--jp-space-3);
+            border-radius: 6px;
+            font-family: var(--jp-font-heading);
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: var(--jp-transition);
+            cursor: pointer;
+            border: none;
+            width: 100%;
+        }
+
+        .jp-btn-primary {
+            background: var(--jp-gold);
+            color: var(--jp-navy);
+        }
+
+        .jp-btn-primary:hover:not(:disabled) {
+            background: var(--jp-gold-light);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(201, 169, 97, 0.3);
+        }
+
+        .jp-btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .jp-btn-secondary {
+            background: transparent;
+            color: var(--jp-navy);
+            border: 2px solid var(--jp-gray-100);
+        }
+
+        .jp-btn-secondary:hover {
+            border-color: var(--jp-navy);
+            background: var(--jp-gray-50);
+        }
+
+        .jp-form-divider {
+            display: flex;
+            align-items: center;
+            margin: var(--jp-space-3) 0;
+            color: var(--jp-gray-800);
+            font-size: 0.875rem;
+        }
+
+        .jp-form-divider::before,
+        .jp-form-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--jp-gray-100);
+        }
+
+        .jp-form-divider span {
+            padding: 0 var(--jp-space-2);
+        }
+
+        .jp-form-footer {
+            text-align: center;
+            margin-top: var(--jp-space-3);
+            padding-top: var(--jp-space-3);
+            border-top: 1px solid var(--jp-gray-100);
+            font-size: 0.875rem;
+            color: var(--jp-gray-800);
+        }
+
+        .jp-form-footer a {
+            color: var(--jp-navy);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .jp-hidden { display: none !important; }
+
+        .jp-success-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--jp-success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--jp-space-3);
+            color: var(--jp-white);
+            font-size: 2rem;
+        }
+
+        .jp-success-title {
+            font-family: var(--jp-font-heading);
+            font-size: 1.5rem;
+            color: var(--jp-navy);
+            text-align: center;
+            margin-bottom: var(--jp-space-2);
+        }
+
+        .jp-success-message {
+            text-align: center;
+            color: var(--jp-gray-800);
+            margin-bottom: var(--jp-space-3);
+        }
+
+        /* Hero */
+        .jp-hero {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--jp-navy) 0%, var(--jp-navy-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding-top: 80px;
+        }
+
+        .jp-hero::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--jp-glow) 0%, transparent 70%);
+            opacity: 0.1;
+            top: -200px;
+            right: -200px;
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.1; }
+            50% { transform: scale(1.2); opacity: 0.15; }
+        }
+
+        .jp-hero-content {
+            max-width: 900px;
+            text-align: center;
+            padding: var(--jp-space-4);
+            position: relative;
+            z-index: 2;
+        }
+
+        .jp-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(201, 169, 97, 0.15);
+            border: 1px solid var(--jp-gold);
+            color: var(--jp-gold);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: var(--jp-space-3);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .jp-hero-title {
+            font-family: var(--jp-font-heading);
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            color: var(--jp-white);
+            line-height: 1.1;
+            margin-bottom: var(--jp-space-3);
+        }
+
+        .jp-hero-title-accent {
+            background: linear-gradient(135deg, var(--jp-gold) 0%, var(--jp-glow) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .jp-hero-subtitle {
+            font-size: clamp(1.125rem, 2vw, 1.5rem);
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: var(--jp-space-4);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            font-weight: 300;
+        }
+
+        .jp-hero-cta {
+            display: flex;
+            gap: var(--jp-space-2);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Trust Bar */
+        .jp-trust {
+            background: var(--jp-white);
+            padding: var(--jp-space-3) 0;
+            border-bottom: 1px solid var(--jp-gray-100);
+        }
+
+        .jp-trust-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--jp-space-3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--jp-space-2);
+            flex-wrap: wrap;
+            font-size: 0.875rem;
+        }
+
+        .jp-trust-logo {
+            font-family: var(--jp-font-heading);
+            font-weight: 700;
+            color: var(--jp-navy);
+            font-style: italic;
+        }
+
+        .jp-trust-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Products */
+        .jp-products {
+            padding: var(--jp-space-6) 0;
+            background: var(--jp-gray-50);
+        }
+
+        .jp-section-header {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto var(--jp-space-5);
+            padding: 0 var(--jp-space-3);
+        }
+
+        .jp-section-label {
+            color: var(--jp-gold);
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .jp-section-title {
+            font-family: var(--jp-font-heading);
+            font-size: clamp(1.875rem, 4vw, 2.5rem);
+            color: var(--jp-navy);
+            margin: var(--jp-space-1) 0;
+        }
+
+        .jp-products-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--jp-space-3);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--jp-space-3);
+        }
+
+        .jp-product-card {
+            background: var(--jp-white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: var(--jp-transition-slow);
+        }
+
+        .jp-product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .jp-product-image {
+            width: 100%;
+            height: 280px;
+            background: linear-gradient(135deg, var(--jp-navy) 0%, var(--jp-navy-light) 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .jp-product-badge {
+            position: absolute;
+            top: var(--jp-space-2);
+            left: var(--jp-space-2);
+            background: var(--jp-gold);
+            color: var(--jp-navy);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .jp-product-info {
+            padding: var(--jp-space-3);
+        }
+
+        .jp-product-name {
+            font-family: var(--jp-font-heading);
+            font-size: 1.25rem;
+            color: var(--jp-navy);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .jp-product-desc {
+            font-size: 0.875rem;
+            color: var(--jp-gray-800);
+            margin-bottom: var(--jp-space-2);
+        }
+
+        .jp-product-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--jp-space-2);
+        }
+
+        .jp-product-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--jp-navy);
+        }
+
+        .jp-product-stock {
+            font-size: 0.875rem;
+            color: var(--jp-success);
+        }
+
+        .jp-product-stock.low {
+            color: var(--jp-gold);
+        }
+
+        .jp-btn-buy {
+            background: var(--jp-navy);
+            color: var(--jp-white);
+        }
+
+        .jp-btn-buy:hover {
+            background: var(--jp-navy-light);
+        }
+
+        /* Features */
+        .jp-features {
+            padding: var(--jp-space-6) 0;
+            background: var(--jp-white);
+        }
+
+        .jp-features-grid {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 var(--jp-space-3);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--jp-space-4);
+            text-align: center;
+        }
+
+        .jp-feature-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--jp-navy) 0%, var(--jp-navy-light) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--jp-space-2);
+            color: var(--jp-gold);
+            font-size: 1.5rem;
+        }
+
+        .jp-feature-title {
+            font-family: var(--jp-font-heading);
+            font-size: 1.25rem;
+            color: var(--jp-navy);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Newsletter */
+        .jp-newsletter {
+            padding: var(--jp-space-6) 0;
+            background: var(--jp-navy);
+            position: relative;
+            color: var(--jp-white);
+            text-align: center;
+        }
+
+        .jp-newsletter-content {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 var(--jp-space-3);
+        }
+
+        .jp-newsletter-title {
+            font-family: var(--jp-font-heading);
+            font-size: 2rem;
+            margin-bottom: var(--jp-space-2);
+        }
+
+        .jp-newsletter-desc {
+            color: rgba(255,255,255,0.8);
+            margin-bottom: var(--jp-space-3);
+        }
+
+        .jp-newsletter-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--jp-space-2);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .jp-form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--jp-space-2);
+        }
+
+        .jp-input-light {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--jp-white);
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .jp-input-light::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .jp-input-light:focus {
+            outline: none;
+            border-color: var(--jp-gold);
+        }
+
+        .jp-btn-gold {
+            background: var(--jp-gold);
+            color: var(--jp-navy);
+            margin-top: var(--jp-space-1);
+        }
+
+        .jp-btn-gold:hover {
+            background: var(--jp-gold-light);
+        }
+
+        .jp-privacy-note {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.6);
+            margin-top: var(--jp-space-2);
+        }
+
+        .jp-privacy-note a {
+            color: var(--jp-gold);
+        }
+
+        /* Footer */
+        .jp-footer {
+            background: var(--jp-navy-dark);
+            color: var(--jp-white);
+            padding: var(--jp-space-5) 0 var(--jp-space-3);
+        }
+
+        .jp-footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--jp-space-3);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--jp-space-4);
+        }
+
+        .jp-footer-logo {
+            font-family: var(--jp-font-heading);
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-style: italic;
+            margin-bottom: var(--jp-space-2);
+        }
+
+        .jp-footer-social {
+            display: flex;
+            gap: var(--jp-space-1);
+            margin-top: var(--jp-space-2);
+        }
+
+        .jp-social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--jp-white);
+            text-decoration: none;
+            transition: var(--jp-transition);
+        }
+
+        .jp-social-link:hover {
+            background: var(--jp-gold);
+            color: var(--jp-navy);
+        }
+
+        .jp-footer-col h4 {
+            font-family: var(--jp-font-heading);
+            color: var(--jp-gold);
+            margin-bottom: var(--jp-space-2);
+        }
+
+        .jp-footer-links {
+            list-style: none;
+        }
+
+        .jp-footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .jp-footer-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: var(--jp-transition);
+        }
+
+        .jp-footer-links a:hover {
+            color: var(--jp-white);
+            padding-left: 5px;
+        }
+
+        .jp-footer-bottom {
+            max-width: 1200px;
+            margin: var(--jp-space-4) auto 0;
+            padding: var(--jp-space-3) var(--jp-space-3) 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: var(--jp-space-2);
+            font-size: 0.875rem;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* Spinner */
+        .jp-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: var(--jp-navy);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .jp-nav-container {
+                padding: var(--jp-space-1) var(--jp-space-2);
+            }
+            
+            .jp-hero-cta {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .jp-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .jp-form-row,
+            .jp-newsletter-form .jp-form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .jp-products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .jp-trust-container {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="jp-nav">
+        <div class="jp-nav-container">
+            <a href="/" class="jp-logo">
+                <span class="jp-logo-text">JP</span>
+                <span class="jp-logo-accent">ENG</span>
+            </a>
+            
+            <div class="jp-nav-actions">
+                <div class="jp-lang-switcher">
+                    <button class="jp-lang-btn">
+                        <span>🌐</span>
+                        <span>EN</span>
+                    </button>
+                    <div class="jp-dropdown">
+                        <a href="#" class="active">English</a>
+                        <a href="#">Español</a>
+                        <a href="#">Français</a>
+                    </div>
+                </div>
+
+                <div class="jp-user-section">
+                    <button class="jp-user-btn" id="user-btn" onclick="toggleModal()">
+                        <span>👤</span>
+                        <span id="user-btn-text">Sign In</span>
+                    </button>
+                    
+                    <div class="jp-dropdown" id="user-dropdown" style="min-width: 200px;">
+                        <div class="jp-user-header">
+                            <div class="jp-user-name" id="dropdown-name">Guest User</div>
+                            <div class="jp-user-email" id="dropdown-email">guest@example.com</div>
+                        </div>
+                        <div style="padding: 0.5rem 0;">
+                            <a href="#" onclick="alert('Profile - TODO')">My Profile</a>
+                            <a href="#" onclick="alert('Orders - TODO')">My Orders</a>
+                            <a href="#" onclick="logout()" style="color: var(--jp-error);">Sign Out</a>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="jp-cart-btn">
+                    <span>🛒</span>
+                    <span id="cart-count">0</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Auth Modal -->
+    <div class="jp-modal-overlay" id="auth-modal" onclick="closeOnOverlay(event)">
+        <div class="jp-modal" onclick="event.stopPropagation()">
+            
+            <!-- Login -->
+            <div id="login-form-container">
+                <div class="jp-modal-header">
+                    <h2 class="jp-modal-title">Welcome Back</h2>
+                    <button class="jp-modal-close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="jp-modal-body">
+                    <form onsubmit="handleLogin(event)">
+                        <div class="jp-form-group">
+                            <label class="jp-form-label">Email Address</label>
+                            <input type="email" class="jp-input" name="email" required placeholder="you@example.com">
+                        </div>
+                        <div class="jp-form-group">
+                            <label class="jp-form-label">Password</label>
+                            <input type="password" class="jp-input" name="password" required placeholder="••••••••">
+                        </div>
+                        <div class="jp-checkbox-group">
+                            <input type="checkbox" class="jp-checkbox" id="remember" name="remember">
+                            <label class="jp-checkbox-label" for="remember">Remember me</label>
+                        </div>
+                        <button type="submit" class="jp-btn jp-btn-primary" id="login-submit">
+                            <span>Sign In</span>
+                        </button>
+                    </form>
+                    
+                    <div class="jp-form-divider"><span>or</span></div>
+                    
+                    <button class="jp-btn jp-btn-secondary" onclick="showRegister()">
+                        Create New Account
+                    </button>
+                    
+                    <div class="jp-form-footer">
+                        <a href="#" onclick="alert('TODO: Password reset')">Forgot password?</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Register -->
+            <div id="register-form-container" class="jp-hidden">
+                <div class="jp-modal-header">
+                    <h2 class="jp-modal-title">Create Account</h2>
+                    <button class="jp-modal-close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="jp-modal-body">
+                    <form onsubmit="handleRegister(event)">
+                        <div class="jp-form-row">
+                            <div class="jp-form-group">
+                                <label class="jp-form-label">First Name <span class="jp-required">*</span></label>
+                                <input type="text" class="jp-input" name="firstName" required placeholder="John">
+                            </div>
+                            <div class="jp-form-group">
+                                <label class="jp-form-label">Last Name <span class="jp-required">*</span></label>
+                                <input type="text" class="jp-input" name="lastName" required placeholder="Doe">
+                            </div>
+                        </div>
+                        
+                        <div class="jp-form-group">
+                            <label class="jp-form-label">Email <span class="jp-required">*</span></label>
+                            <input type="email" class="jp-input" name="email" required placeholder="you@example.com">
+                        </div>
+                        
+                        <div class="jp-form-group">
+                            <label class="jp-form-label">Phone</label>
+                            <input type="tel" class="jp-input" name="phone" placeholder="+1 (555) 123-4567">
+                        </div>
+                        
+                        <div class="jp-form-row">
+                            <div class="jp-form-group">
+                                <label class="jp-form-label">Password <span class="jp-required">*</span></label>
+                                <input type="password" class="jp-input" name="password" required minlength="8" placeholder="Min 8 characters">
+                            </div>
+                            <div class="jp-form-group">
+                                <label class="jp-form-label">Confirm <span class="jp-required">*</span></label>
+                                <input type="password" class="jp-input" name="confirmPassword" required placeholder="Repeat">
+                            </div>
+                        </div>
+                        
+                        <div class="jp-checkbox-group">
+                            <input type="checkbox" class="jp-checkbox" id="newsletter" name="newsletter" checked>
+                            <label class="jp-checkbox-label" for="newsletter">Send me product updates</label>
+                        </div>
+                        
+                        <div class="jp-checkbox-group">
+                            <input type="checkbox" class="jp-checkbox" id="terms" name="terms" required>
+                            <label class="jp-checkbox-label" for="terms">
+                                I agree to <a href="#">Terms</a> & <a href="#">Privacy</a> <span class="jp-required">*</span>
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="jp-btn jp-btn-primary" id="register-submit">
+                            <span>Create Account</span>
+                        </button>
+                    </form>
+                    
+                    <div class="jp-form-divider"><span>or</span></div>
+                    
+                    <button class="jp-btn jp-btn-secondary" onclick="showLogin()">
+                        Already have account? Sign In
+                    </button>
+                </div>
+            </div>
+
+            <!-- Success -->
+            <div id="register-success" class="jp-hidden">
+                <div class="jp-modal-body" style="padding: var(--jp-space-4);">
+                    <div class="jp-success-icon">✓</div>
+                    <h3 class="jp-success-title">Welcome to JP ENG!</h3>
+                    <p class="jp-success-message">
+                        Account created. Confirmation sent to <strong id="success-email"></strong>.
+                    </p>
+                    <button class="jp-btn jp-btn-primary" onclick="showLogin()">
+                        Continue to Sign In
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Hero -->
+    <header class="jp-hero">
+        <div class="jp-hero-content">
+            <div class="jp-hero-badge">
+                <span>✨</span>
+                <span>JP ENG Supply Chain Powered</span>
+            </div>
+            <h1 class="jp-hero-title">
+                Transform Your Space With<br>
+                <span class="jp-hero-title-accent">Smart Ambient Lighting</span>
+            </h1>
+            <p class="jp-hero-subtitle">
+                Premium LED strips and atmosphere lamps curated by our sustainable procurement network. 
+                Direct from factory to your door.
+            </p>
+            <div class="jp-hero-cta">
+                <a href="#products" class="jp-btn jp-btn-primary">
+                    Shop Now →
+                </a>
+                <a href="#features" class="jp-btn jp-btn-secondary">
+                    View Collection
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Trust Bar -->
+    <section class="jp-trust">
+        <div class="jp-trust-container">
+            <span>Powered by</span>
+            <span class="jp-trust-logo">JP ENG</span>
+            <span style="color: var(--jp-gray-100);">|</span>
+            <span class="jp-trust-item">🌍 Global Logistics</span>
+            <span class="jp-trust-item">✓ Quality Certified</span>
+            <span class="jp-trust-item">⚡ Fast Shipping</span>
+        </div>
+    </section>
+
+    <!-- Products -->
+    <section class="jp-products" id="products">
+        <div class="jp-section-header">
+            <span class="jp-section-label">Curated Collection</span>
+            <h2 class="jp-section-title">Ambient Lighting Essentials</h2>
+            <p class="jp-section-desc">Handpicked by our procurement specialists. New arrivals weekly.</p>
+        </div>
+
+        <div class="jp-products-grid" id="product-grid">
+            <!-- Products injected by JS -->
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="jp-features" id="features">
+        <div class="jp-section-header">
+            <span class="jp-section-label">Why Choose Us</span>
+            <h2 class="jp-section-title">The JP ENG Difference</h2>
+        </div>
+        
+        <div class="jp-features-grid">
+            <div class="jp-feature-item">
+                <div class="jp-feature-icon">🏭</div>
+                <h3 class="jp-feature-title">Direct Sourcing</h3>
+                <p>Factory-direct procurement eliminates middlemen.</p>
+            </div>
+            <div class="jp-feature-item">
+                <div class="jp-feature-icon">🌱</div>
+                <h3 class="jp-feature-title">Sustainable Supply</h3>
+                <p>Carbon-neutral logistics and eco packaging.</p>
+            </div>
+            <div class="jp-feature-item">
+                <div class="jp-feature-icon">🔒</div>
+                <h3 class="jp-feature-title">Secure Payment</h3>
+                <p>Stripe-powered checkout with 256-bit encryption.</p>
+            </div>
+            <div class="jp-feature-item">
+                <div class="jp-feature-icon">🚀</div>
+                <h3 class="jp-feature-title">Fast Dispatch</h3>
+                <p>24-hour processing with tracked shipping.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="jp-newsletter">
+        <div class="jp-newsletter-content">
+            <h2 class="jp-newsletter-title">Join the JP ENG Community</h2>
+            <p class="jp-newsletter-desc">
+                Create an account for exclusive access to new arrivals and member pricing.
+            </p>
+            
+            <form class="jp-newsletter-form" onsubmit="handleQuickRegister(event)">
+                <div class="jp-form-row">
+                    <input type="text" class="jp-input-light" name="firstName" placeholder="First Name" required>
+                    <input type="text" class="jp-input-light" name="lastName" placeholder="Last Name" required>
+                </div>
+                <input type="email" class="jp-input-light" name="email" placeholder="Email Address" required>
+                <input type="password" class="jp-input-light" name="password" placeholder="Create Password" minlength="8" required>
+                
+                <button type="submit" class="jp-btn jp-btn-gold">
+                    Create Free Account
+                </button>
+                
+                <p class="jp-privacy-note">
+                    By registering, you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.
+                </p>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="jp-footer">
+        <div class="jp-footer-container">
+            <div>
+                <div class="jp-footer-logo">JP ENG</div>
+                <p style="color: rgba(255,255,255,0.7); font-size: 0.875rem;">
+                    Sustainable procurement and supply chain management.
+                </p>
+                <div class="jp-footer-social">
+                    <a href="#" class="jp-social-link">f</a>
+                    <a href="#" class="jp-social-link">in</a>
+                    <a href="#" class="jp-social-link">📷</a>
+                </div>
+            </div>
+            
+            <div class="jp-footer-col">
+                <h4>Shop</h4>
+                <ul class="jp-footer-links">
+                    <li><a href="#products">All Products</a></li>
+                    <li><a href="#">LED Strips</a></li>
+                    <li><a href="#">Ambient Lamps</a></li>
+                </ul>
+            </div>
+            
+            <div class="jp-footer-col">
+                <h4>Support</h4>
+                <ul class="jp-footer-links">
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Shipping</a></li>
+                    <li><a href="#">Returns</a></li>
+                </ul>
+            </div>
+            
+            <div class="jp-footer-col">
+                <h4>Account</h4>
+                <ul class="jp-footer-links">
+                    <li><a href="#" onclick="toggleModal(); return false;">Sign In</a></li>
+                    <li><a href="#" onclick="showRegister(); toggleModal(); return false;">Create Account</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="jp-footer-bottom">
+            <span>© 2026 JPENG. All rights reserved.</span>
+            <span>🔒 Secure Stripe Checkout</span>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // User State
+        let currentUser = null;
+        
+        // Check session on load
+        if (localStorage.getItem('jpeng-user')) {
+            try {
+                currentUser = JSON.parse(localStorage.getItem('jpeng-user'));
+                updateUI();
+            } catch(e) {
+                localStorage.removeItem('jpeng-user');
+            }
+        }
+
+        // Products Data
+        const products = [
+            { id: 1, name: 'Smart LED Strip 5M', desc: 'RGBIC dream color with app control. Music sync.', price: 29.99, badge: 'Bestseller', stock: 'In Stock' },
+            { id: 2, name: 'Ambient Lamp Pro', desc: 'Sunrise simulation, 16M colors, voice control.', price: 49.99, badge: 'New', stock: 'In Stock' },
+            { id: 3, name: 'Neon Flex Light 3M', desc: 'Silicone neon tube effect. Cuttable & bendable.', price: 39.99, badge: null, stock: 'Low Stock' }
+        ];
+
+        // Render Products
+        function renderProducts() {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = products.map(p => `
+                <article class="jp-product-card">
+                    <div class="jp-product-image">
+                        ${p.badge ? `<span class="jp-product-badge">${p.badge}</span>` : ''}
+                        Product Image
+                    </div>
+                    <div class="jp-product-info">
+                        <h3 class="jp-product-name">${p.name}</h3>
+                        <p class="jp-product-desc">${p.desc}</p>
+                        <div class="jp-product-meta">
+                            <span class="jp-product-price">$${p.price}</span>
+                            <span class="jp-product-stock ${p.stock === 'Low Stock' ? 'low' : ''}">${p.stock}</span>
+                        </div>
+                        <button class="jp-btn jp-btn-buy" onclick="checkout('${p.name}', ${p.price})">
+                            Buy Now →
+                        </button>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        renderProducts();
+
+        // Modal Functions
+        function toggleModal() {
+            if (currentUser) {
+                const dropdown = document.getElementById('user-dropdown');
+                dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+            } else {
+                document.getElementById('auth-modal').classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('auth-modal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function closeOnOverlay(e) {
+            if (e.target.id === 'auth-modal') closeModal();
+        }
+
+        function showLogin() {
+            document.getElementById('login-form-container').classList.remove('jp-hidden');
+            document.getElementById('register-form-container').classList.add('jp-hidden');
+            document.getElementById('register-success').classList.add('jp-hidden');
+        }
+
+        function showRegister() {
+            document.getElementById('login-form-container').classList.add('jp-hidden');
+            document.getElementById('register-form-container').classList.remove('jp-hidden');
+            document.getElementById('register-success').classList.add('jp-hidden');
+        }
+
+        // Auth Handlers
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('login-submit');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="jp-spinner"></div>';
+
+            // TODO: API call
+            await new Promise(r => setTimeout(r, 1000));
+
+            currentUser = {
+                email: e.target.email.value,
+                firstName: 'John',
+                lastName: 'Doe'
+            };
+            
+            localStorage.setItem('jpeng-user', JSON.stringify(currentUser));
+            updateUI();
+            closeModal();
+            btn.disabled = false;
+            btn.innerHTML = '<span>Sign In</span>';
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            
+            if (e.target.password.value !== e.target.confirmPassword.value) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            const btn = document.getElementById('register-submit');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="jp-spinner"></div>';
+
+            // TODO: API call
+            await new Promise(r => setTimeout(r, 1500));
+
+            document.getElementById('success-email').textContent = e.target.email.value;
+            document.getElementById('register-form-container').classList.add('jp-hidden');
+            document.getElementById('register-success').classList.remove('jp-hidden');
+            
+            btn.disabled = false;
+            btn.innerHTML = '<span>Create Account</span>';
+        }
+
+        async function handleQuickRegister(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="jp-spinner" style="border-color: rgba(26,31,60,0.3); border-top-color: var(--jp-navy);"></div>';
+
+            await new Promise(r => setTimeout(r, 1500));
+            
+            alert('Welcome! Account created successfully.');
+            e.target.reset();
+            btn.disabled = false;
+            btn.innerHTML = '<span>Create Free Account</span>';
+        }
+
+        function updateUI() {
+            if (currentUser) {
+                document.getElementById('user-btn').classList.add('logged-in');
+                document.getElementById('user-btn-text').textContent = currentUser.firstName;
+                document.getElementById('dropdown-name').textContent = `${currentUser.firstName} ${currentUser.lastName}`;
+                document.getElementById('dropdown-email').textContent = currentUser.email;
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('jpeng-user');
+            document.getElementById('user-btn').classList.remove('logged-in');
+            document.getElementById('user-btn-text').textContent = 'Sign In';
+            document.getElementById('user-dropdown').style.display = 'none';
+        }
+
+        function checkout(product, price) {
+            if (!currentUser) {
+                toggleModal();
+                return;
+            }
+            alert(`Checkout: ${product} - $${price}\n(TODO: Stripe integration)`);
+        }
+
+        // Close modal on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
